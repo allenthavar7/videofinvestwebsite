@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FINVEST — Finance Council, Fr. CRCE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#090d11;
+    --panel:#10161c;
+    --panel-line:#1e262e;
+    --mint:#00e6a8;
+    --gold:#c9a227;
+    --text:#eaf1f2;
+    --muted:#8a97a3;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--ink);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--mint); color:var(--ink);}
+  a{color:inherit; text-decoration:none;}
+  .mono{font-family:'IBM Plex Mono', monospace;}
+
+  /* ---------- SPLASH / PRELOADER ---------- */
+  #splash{
+    position:fixed; inset:0; z-index:999;
+    background:var(--ink);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:22px;
+    transition:opacity .6s ease, visibility .6s ease;
+  }
+  #splash.hide{ opacity:0; visibility:hidden; pointer-events:none; }
+  #splash img{
+    width:88px; height:88px;
+    object-fit:contain;
+    animation:splashPulse 1.6s ease-in-out infinite;
+  }
+  #splash .splash-word{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:1.6rem;
+    letter-spacing:0.06em;
+  }
+  #splash .splash-word span{color:var(--mint);}
+  #splash .splash-bar{
+    width:140px; height:2px;
+    background:var(--panel-line);
+    overflow:hidden;
+    border-radius:2px;
+  }
+  #splash .splash-bar::after{
+    content:'';
+    display:block;
+    width:40%; height:100%;
+    background:var(--mint);
+    animation:splashLoad 1.2s ease-in-out infinite;
+  }
+  @keyframes splashPulse{
+    0%,100%{ transform:scale(1); opacity:1; }
+    50%{ transform:scale(1.06); opacity:.85; }
+  }
+  @keyframes splashLoad{
+    0%{ transform:translateX(-100%); }
+    100%{ transform:translateX(350%); }
+  }
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:fixed; top:0; left:0; right:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:22px 5vw;
+    backdrop-filter:blur(10px);
+    background:linear-gradient(to bottom, rgba(9,13,17,0.85), transparent);
+  }
+  .brand{
+    font-family:'Fraunces', serif;
+    font-size:1.3rem;
+    font-weight:600;
+    letter-spacing:0.02em;
+  }
+  .brand span{color:var(--mint);}
+  .nav-links{display:flex; gap:36px; font-size:0.85rem;}
+  .nav-links a{
+    color:var(--muted);
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    font-size:0.72rem;
+    transition:color .2s;
+  }
+  .nav-links a:hover{color:var(--text);}
+  .nav-links a:focus-visible{outline:1px solid var(--mint); outline-offset:4px;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    height:100svh;
+    min-height:640px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:0 6vw;
+  }
+  canvas#chart{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    z-index:0;
+  }
+  .hero::after{
+    content:'';
+    position:absolute; inset:0;
+    background:
+      radial-gradient(ellipse at 50% 40%, rgba(9,13,17,0.15) 0%, rgba(9,13,17,0.75) 62%, rgba(9,13,17,0.97) 100%);
+    z-index:1;
+    pointer-events:none;
+  }
+  .hero-content{position:relative; z-index:2;}
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.72rem;
+    letter-spacing:0.28em;
+    text-transform:uppercase;
+    color:var(--mint);
+    margin-bottom:22px;
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+  }
+  .eyebrow::before{
+    content:'';
+    width:6px; height:6px; border-radius:50%;
+    background:var(--mint);
+    box-shadow:0 0 8px var(--mint);
+    animation:pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{opacity:1;} 50%{opacity:.35;}
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:clamp(3.2rem, 11vw, 8.5rem);
+    line-height:0.92;
+    letter-spacing:-0.01em;
+  }
+  h1 em{
+    font-style:italic;
+    font-weight:500;
+    color:var(--mint);
+  }
+  .hero-sub{
+    max-width:540px;
+    margin:26px auto 0;
+    color:var(--muted);
+    font-size:1.02rem;
+    line-height:1.6;
+  }
+  .hero-cta{
+    margin-top:40px;
+    display:flex;
+    gap:16px;
+    justify-content:center;
+    flex-wrap:wrap;
+  }
+  .btn{
+    padding:14px 28px;
+    border-radius:2px;
+    font-size:0.82rem;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    font-weight:500;
+    transition:transform .2s, background .2s, border-color .2s;
+    display:inline-block;
+  }
+  .btn-primary{
+    background:var(--mint);
+    color:var(--ink);
+  }
+  .btn-primary:hover{transform:translateY(-2px);}
+  .btn-ghost{
+    border:1px solid var(--panel-line);
+    color:var(--text);
+  }
+  .btn-ghost:hover{border-color:var(--mint); transform:translateY(-2px);}
+  .btn:focus-visible{outline:2px solid var(--mint); outline-offset:3px;}
+
+  /* ---------- TICKER STRIP ---------- */
+  .ticker-strip{
+    position:relative;
+    z-index:2;
+    border-top:1px solid var(--panel-line);
+    border-bottom:1px solid var(--panel-line);
+    background:var(--panel);
+    overflow:hidden;
+    padding:13px 0;
+  }
+  .ticker-track{
+    display:flex;
+    width:max-content;
+    animation:scrollTicker 38s linear infinite;
+    gap:52px;
+  }
+  @keyframes scrollTicker{
+    from{transform:translateX(0);}
+    to{transform:translateX(-50%);}
+  }
+  .tick{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.78rem;
+    color:var(--muted);
+    white-space:nowrap;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .tick b{color:var(--text); font-weight:500;}
+  .tick .up{color:var(--mint);}
+  .tick .down{color:#e2604f;}
+
+  /* ---------- SECTION SHELL ---------- */
+  section{padding:130px 6vw;}
+  .section-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:40px;
+    margin-bottom:64px;
+    flex-wrap:wrap;
+  }
+  .section-eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.7rem;
+    letter-spacing:0.24em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin-bottom:14px;
+  }
+  .section-title{
+    font-family:'Fraunces', serif;
+    font-size:clamp(2rem, 4vw, 3.2rem);
+    font-weight:500;
+    line-height:1.05;
+    max-width:640px;
+  }
+  .section-note{
+    max-width:340px;
+    color:var(--muted);
+    font-size:0.92rem;
+    line-height:1.6;
+  }
+
+  /* ---------- ABOUT ---------- */
+  .about{
+    background:var(--panel);
+    border-top:1px solid var(--panel-line);
+    border-bottom:1px solid var(--panel-line);
+  }
+  .about-grid{
+    display:grid;
+    grid-template-columns:1.1fr 0.9fr;
+    gap:80px;
+  }
+  .about-text p{
+    color:var(--muted);
+    font-size:1.05rem;
+    line-height:1.75;
+    margin-bottom:20px;
+  }
+  .about-text strong{color:var(--text); font-weight:500;}
+  .stat-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:1px;
+    background:var(--panel-line);
+    border:1px solid var(--panel-line);
+  }
+  .stat{
+    background:var(--panel);
+    padding:32px 28px;
+  }
+  .stat .num{
+    font-family:'Fraunces', serif;
+    font-size:2.4rem;
+    color:var(--mint);
+    font-weight:500;
+  }
+  .stat .label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.68rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-top:8px;
+  }
+
+  /* ---------- INITIATIVES ---------- */
+  .init-grid{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:1px;
+    background:var(--panel-line);
+    border:1px solid var(--panel-line);
+  }
+  .init-card{
+    background:var(--ink);
+    padding:44px;
+    transition:background .25s;
+    position:relative;
+  }
+  .init-card:hover{background:var(--panel);}
+  .init-index{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.72rem;
+    color:var(--gold);
+    letter-spacing:0.08em;
+  }
+  .init-card h3{
+    font-family:'Fraunces', serif;
+    font-size:1.6rem;
+    font-weight:500;
+    margin:18px 0 12px;
+  }
+  .init-card p{
+    color:var(--muted);
+    font-size:0.94rem;
+    line-height:1.65;
+  }
+
+  /* ---------- TEAM ---------- */
+  .team{
+    background:var(--panel);
+    border-top:1px solid var(--panel-line);
+    border-bottom:1px solid var(--panel-line);
+  }
+  .team-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(240px,1fr));
+    gap:1px;
+    background:var(--panel-line);
+    border:1px solid var(--panel-line);
+  }
+  .member{
+    background:var(--panel);
+    padding:36px 30px;
+  }
+  .member .role{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.66rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--mint);
+    margin-bottom:10px;
+  }
+  .member h4{
+    font-family:'Fraunces', serif;
+    font-size:1.35rem;
+    font-weight:500;
+  }
+
+  /* ---------- CONTACT / FOOTER ---------- */
+  footer{
+    padding:110px 6vw 50px;
+    text-align:center;
+  }
+  footer h2{
+    font-family:'Fraunces', serif;
+    font-size:clamp(2.2rem, 6vw, 4.4rem);
+    font-weight:500;
+    line-height:1.05;
+    max-width:820px;
+    margin:0 auto 30px;
+  }
+  footer h2 em{color:var(--mint); font-style:italic;}
+  .footer-links{
+    margin-top:34px;
+    display:flex; gap:28px; justify-content:center;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.8rem;
+  }
+  .footer-links a{color:var(--muted); transition:color .2s;}
+  .footer-links a:hover{color:var(--mint);}
+  .footer-bottom{
+    margin-top:90px;
+    padding-top:24px;
+    border-top:1px solid var(--panel-line);
+    display:flex;
+    justify-content:space-between;
+    color:var(--muted);
+    font-size:0.72rem;
+    font-family:'IBM Plex Mono', monospace;
+    letter-spacing:0.03em;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+
+  @media (max-width:820px){
+    .nav-links{display:none;}
+    .about-grid{grid-template-columns:1fr;}
+    .init-grid{grid-template-columns:1fr;}
+    section{padding:90px 6vw;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .ticker-track{animation:none;}
+    .eyebrow::before{animation:none;}
+    #splash img{animation:none;}
+    #splash .splash-bar::after{animation:none;}
+  }
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <img src="finvest.jpg.png" alt="FINVEST logo">
+  <div class="splash-word">FIN<span>VEST</span></div>
+  <div class="splash-bar"></div>
+</div>
+
+<nav>
+  <div class="brand">FIN<span>VEST</span></div>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#initiatives">Initiatives</a>
+    <a href="#team">Council</a>
+    <a href="#contact">Join</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <canvas id="chart"></canvas>
+  <div class="hero-content">
+    <div class="eyebrow">Finance Council — Fr. CRCE — 2026-27</div>
+    <h1>FIN<em>VEST</em></h1>
+    <p class="hero-sub">Where engineers learn to read markets. We run the case competitions, speaker sessions, and market-literacy drives that turn curiosity about capital into conviction.</p>
+    <div class="hero-cta">
+      <a href="#initiatives" class="btn btn-primary">See what we run</a>
+      <a href="#contact" class="btn btn-ghost">Get involved</a>
+    </div>
+  </div>
+</section>
+
+<div class="ticker-strip">
+  <div class="ticker-track" id="tickerTrack"></div>
+</div>
+
+<section class="about" id="about">
+  <div class="section-head">
+    <div>
+      <div class="section-eyebrow">// The Council</div>
+      <h2 class="section-title">Financial literacy, built by students, for students.</h2>
+    </div>
+    <p class="section-note">FINVEST sits within the FRCRCE student council system as the dedicated voice for finance, investing, and career readiness in commerce and capital markets.</p>
+  </div>
+  <div class="about-grid">
+    <div class="about-text">
+      <p>Most engineering campuses teach you to build things. <strong>FINVEST exists to teach you what to do with what you build</strong> — how it's valued, funded, and grown. We're the council that brings markets, portfolios, and boardroom thinking onto a campus built for circuits and code.</p>
+      <p>From flagship case-study competitions to closed-room sessions with founders and analysts, every initiative is designed to be useful on day one — not theoretical, not distant. We want every member walking out with a sharper read on how capital actually moves.</p>
+    </div>
+    <div class="stat-grid">
+      <div class="stat"><div class="num">01</div><div class="label">Council formed</div></div>
+      <div class="stat"><div class="num">4+</div><div class="label">Flagship initiatives</div></div>
+      <div class="stat"><div class="num">CRCE</div><div class="label">Bandra, Mumbai</div></div>
+      <div class="stat"><div class="num">∞</div><div class="label">Market curiosity</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="initiatives">
+  <div class="section-head">
+    <div>
+      <div class="section-eyebrow">// What we run</div>
+      <h2 class="section-title">Four ways we put finance in front of the campus.</h2>
+    </div>
+    <p class="section-note">Each initiative is a different entry point — compete, listen, fund, or follow.</p>
+  </div>
+  <div class="init-grid">
+    <div class="init-card">
+      <div class="init-index">CASE COMP</div>
+      <h3>Competitions</h3>
+      <p>Inter-college case-study and stock-pitch competitions that put real portfolios and real deadlines in front of participants — judged by people who work in the field.</p>
+    </div>
+    <div class="init-card">
+      <div class="init-index">SPEAKER SERIES</div>
+      <h3>Guest Sessions</h3>
+      <p>Founders, analysts, and alumni in finance roles, brought in for closed-room conversations that go past the LinkedIn-post version of their career.</p>
+    </div>
+    <div class="init-card">
+      <div class="init-index">PARTNERSHIPS</div>
+      <h3>Sponsors</h3>
+      <p>Building relationships with firms and platforms willing to back student finance education — funding events, prizes, and resources for members.</p>
+    </div>
+    <div class="init-card">
+      <div class="init-index">MARKET WATCH</div>
+      <h3>Content & Instagram</h3>
+      <p>Bite-sized market commentary, event recaps, and campus finance news — keeping the council visible and useful between events, not just during them.</p>
+    </div>
+  </div>
+</section>
+
+<section class="team" id="team">
+  <div class="section-head">
+    <div>
+      <div class="section-eyebrow">// Leadership</div>
+      <h2 class="section-title">The people steering the council.</h2>
+    </div>
+  </div>
+  <div class="team-grid">
+    <div class="member">
+      <div class="role">Council Lead</div>
+      <h4>Nathan Dsouza</h4>
+    </div>
+    <div class="member">
+      <div class="role">Council Lead</div>
+      <h4>Aditya Kurup</h4>
+    </div>
+    <div class="member">
+      <div class="role">Member</div>
+      <h4>Allen</h4>
+    </div>
+  </div>
+</section>
+
+<footer id="contact">
+  <div class="section-eyebrow" style="justify-content:center; display:flex;">// Join Us</div>
+  <h2>Have an idea for FINVEST? <em>Bring it to the table.</em></h2>
+  <div class="footer-links">
+    <a href="mailto:finvest.frcrce@gmail.com">finvest.frcrce@gmail.com</a>
+    <a href="#">Instagram</a>
+    <a href="#">LinkedIn</a>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026-27 FINVEST — Finance Council, Fr. CRCE</span>
+    <span>BUILT FOR THE COUNCIL</span>
+  </div>
+</footer>
+
+<script>
+  // ---- Splash screen ----
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.getElementById('splash').classList.add('hide');
+    }, 1400);
+  });
+
+  // ---- Ticker content ----
+  const tickers = [
+    {sym:'NIFTY 50', val:'24,812.40', chg:'+0.62%', up:true},
+    {sym:'SENSEX', val:'81,204.15', chg:'+0.58%', up:true},
+    {sym:'BANK NIFTY', val:'52,340.90', chg:'-0.21%', up:false},
+    {sym:'RELIANCE', val:'2,981.20', chg:'+1.14%', up:true},
+    {sym:'TCS', val:'4,102.55', chg:'-0.34%', up:false},
+    {sym:'INFY', val:'1,588.30', chg:'+0.87%', up:true},
+    {sym:'HDFC BANK', val:'1,742.10', chg:'+0.29%', up:true},
+    {sym:'USD/INR', val:'86.42', chg:'-0.08%', up:false},
+    {sym:'GOLD', val:'₹71,230', chg:'+0.44%', up:true},
+    {sym:'CRUDE', val:'$78.60', chg:'-0.52%', up:false},
+  ];
+  const track = document.getElementById('tickerTrack');
+  function buildTicks(){
+    let html = '';
+    tickers.forEach(t=>{
+      html += `<div class="tick"><b>${t.sym}</b> ${t.val} <span class="${t.up?'up':'down'}">${t.up?'▲':'▼'} ${t.chg}</span></div>`;
+    });
+    return html;
+  }
+  track.innerHTML = buildTicks() + buildTicks();
+
+  // ---- Canvas moving market-chart background ----
+  const canvas = document.getElementById('chart');
+  const ctx = canvas.getContext('2d');
+  let w, h, dpr;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function resize(){
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = canvas.clientWidth;
+    h = canvas.clientHeight;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  function genSeries(points, startY, volatility){
+    const arr = [startY];
+    for(let i=1;i<points;i++){
+      const next = arr[i-1] + (Math.random()-0.5) * volatility;
+      arr.push(Math.max(0.15, Math.min(0.85, next)));
+    }
+    return arr;
+  }
+
+  const POINTS = 140;
+  const seriesA = genSeries(POINTS, 0.55, 0.06);
+  const seriesB = genSeries(POINTS, 0.42, 0.05);
+  let offset = 0;
+
+  function drawGrid(){
+    ctx.strokeStyle = 'rgba(255,255,255,0.045)';
+    ctx.lineWidth = 1;
+    const cols = 14;
+    for(let i=0;i<=cols;i++){
+      const x = (w/cols)*i;
+      ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke();
+    }
+    const rows = 7;
+    for(let i=0;i<=rows;i++){
+      const y = (h/rows)*i;
+      ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke();
+    }
+  }
+
+  function drawLine(series, color, glow, shift){
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.6;
+    ctx.shadowColor = glow;
+    ctx.shadowBlur = 10;
+    const step = w / (POINTS-1);
+    for(let i=0;i<POINTS;i++){
+      const idx = (i + Math.floor(shift)) % POINTS;
+      const x = i*step;
+      const y = h - (series[idx] * h);
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    ctx.lineTo(w, h);
+    ctx.lineTo(0, h);
+    ctx.closePath();
+    const grad = ctx.createLinearGradient(0,0,0,h);
+    grad.addColorStop(0, color.replace('1)','0.10)'));
+    grad.addColorStop(1, color.replace('1)','0)'));
+    ctx.fillStyle = grad;
+    ctx.fill();
+  }
+
+  function frame(){
+    ctx.clearRect(0,0,w,h);
+    drawGrid();
+    drawLine(seriesA, 'rgba(0,230,168,1)', 'rgba(0,230,168,0.5)', offset);
+    drawLine(seriesB, 'rgba(201,162,39,0.75)', 'rgba(201,162,39,0.35)', offset*0.6 + 20);
+    if(!reduceMotion){ offset += 0.045; }
+    requestAnimationFrame(frame);
+  }
+  frame();
+</script>
+
+</body>
+</html>
